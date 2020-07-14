@@ -1,4 +1,4 @@
-'use strict';
+
 
 const fs = require('fs');
 const path = require('path');
@@ -500,7 +500,10 @@ module.exports = function(webpackEnv) {
               options: {
                 name: 'static/media/[name].[hash:8].[ext]',
               },
-            },
+            },{
+              test:/\.scss$/,
+              loaders:['style-loader','css-loader','sass-loader']
+            }
             // ** STOP ** Are you adding a new loader?
             // Make sure to add the new loader(s) before the "file" loader.
           ],
