@@ -1,10 +1,7 @@
 import React from "react";
 import { Switch, Route, BrowserRouter } from "react-router-dom";
-import "./App.scss";
 // 引用组件
-import Home from "./views/Home";
-import About from "./views/About";
-import News from "./views/News";
+import Login from "./views/Login";
 
 class App extends React.Component {
   constructor(props) {
@@ -13,13 +10,10 @@ class App extends React.Component {
   }
   render() {
     return (
-      <div class="test">
-        <h2>dfaf</h2>
+      <div>
         <BrowserRouter>
           <Switch>
-            <Route exact component={Home} path="/" />
-            <Route component={About} path="/About" />
-            <Route component={News} path="/News" />
+            <Route exact component={Login} path="/" />
           </Switch>
         </BrowserRouter>
       </div>
