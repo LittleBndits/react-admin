@@ -27,6 +27,7 @@ class Login extends Component {
         return (
             <div className="form-wrap">
                 <div>
+                <div className="logo">React Admin</div>
                     {this.state.formType === 'login' ? <LoginForm switchForm={this.switchForm}></LoginForm> : <RegisterForm switchForm={this.switchForm}></RegisterForm>}
                 </div>
             </div>
