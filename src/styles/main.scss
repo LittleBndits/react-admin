@@ -1,0 +1,6 @@
+@import "./normalize.scss"; // 样式重置
+@import "./sassConfig.scss"; // 全局性公共样式
+
+body {
+  background-color: $color !important;
+}
