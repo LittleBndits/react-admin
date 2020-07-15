@@ -1,22 +1,20 @@
 import React, { Component, Fragment } from 'react'
 // 組件
-import { Form, Input, Button, message, Row, Col } from 'antd';
+import { Form, Input, Button, Row, Col } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-
-
-// 验证
+// 表单校验
 import { validate_password, validate_Email } from '../../utils/validate'
 // api
-import { Login, Getcode } from '../../api/account'
+import { Login } from '../../api/account'
+// 自定义组件
+import Code from '../../compoents/code/index'
 
 class LoginForm extends Component {
     constructor(props) {
         super(props)
         this.state = {
             username: '',
-            code_button_disabled: true,
-            code_button_loading: false,
-            code_button_text: '获取验证码'
+            module: 'login',
         }
     }
     //登录
@@ -38,58 +36,6 @@ class LoginForm extends Component {
             username: val,//账号
         })
     };
-    // 获取验证码
-    getCode = (data) => {
-        if (!this.state.username) {
-            message.warning('账号不能为空！');
-            return false
-        }
-        this.setState({
-            code_button_loading: true,
-            code_button_text: '发送中',
-        })
-        let params = {
-            username: this.state.username,
-            module: 'login',
-        }
-        console.log("LoginForm -> getCode -> params", params)
-        Getcode(params).then(res => {
-
-            console.log("LoginForm -> getCode -> res", res)
-            // 倒计时
-            this.countdown()
-        }).catch(() => {
-            this.setState({
-                code_button_loading: false,
-                code_button_text: '重新获取',
-            })
-        })
-
-    }
-
-    // 倒计时
-    countdown = () => {
-        const that = this;
-        let timer = null;
-        let sec = 60;
-        timer = setInterval(() => {
-            if (sec <= 0) {
-                that.setState({
-                    code_button_text: '重新获取',
-                    code_button_loading: false,
-                    code_button_disabled: false,
-                })
-                clearInterval(timer)
-                return
-            }
-            sec--;
-            that.setState({
-                code_button_text: `${sec}s`,
-                code_button_loading: false,
-                code_button_disabled: true,
-            })
-        }, 1000)
-    }
 
     // 切换注册
     toggleForm = () => {
@@ -99,9 +45,8 @@ class LoginForm extends Component {
     render() {
 
         // eslint-disable-next-line 
-        const { username, code_button_disabled, code_button_loading, code_button_text } = this.state;
+        const { username,module } = this.state;
         const that = this;
-
         return (
             <Fragment >
                 <div className="form-header">
@@ -138,18 +83,16 @@ class LoginForm extends Component {
                     <Form.Item name="password"
                         rules={[
                             { required: true, message: '请输入密码!' },
-                            { pattern: validate_password, message: '最少6位，包括至少1个大写字母，1个小写字母，1个数字，1个特殊字符' },
                             // 自定义检验
-                            // ({ getFieldValue }) => ({//Es6解构
-                            //     validator(rule, value) {
-                            //         console.log("LoginForm -> validator -> value", value.length)
-                            //         if (value.length < 6) {
-                            //             return Promise.reject('密码不能少于6位')
-                            //         } else {
-                            //             return Promise.resolve()
-                            //         }
-                            //     },
-                            // }),
+                            ({ getFieldValue }) => ({//Es6解构
+                                validator(rule, value) {
+                                    if (!validate_password(value)) {
+                                        return Promise.reject('最少6位，包括至少1个大写字母，1个小写字母，1个数字，1个特殊字符')
+                                    } else {
+                                        return Promise.resolve()
+                                    }
+                                },
+                            }),
                         ]}
                     >
                         <Input.Password prefix={<LockOutlined className="site-form-item-icon" />} placeholder="密码" />
@@ -164,13 +107,7 @@ class LoginForm extends Component {
                                 <Input prefix={<LockOutlined className="site-form-item-icon" />} placeholder="验证码" />
                             </Col>
                             <Col span={9}>
-                                <Button
-                                    type="danger"
-                                    block
-                                    onClick={this.getCode}
-                                    loading={code_button_loading}
-                                    disabled={code_button_disabled}
-                                >{code_button_text}</Button>
+                                <Code username={username} module={module}/>
                             </Col>
                         </Row>
                     </Form.Item>
