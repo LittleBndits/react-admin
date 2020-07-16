@@ -1,4 +1,12 @@
-$color:#00142c;
-$fs12:12px;
-$fs14:14px;
-$fs16:16px;
+$color: #00142c;
+$fs12: 12px;
+$fs14: 14px;
+$fs16: 16px;
+
+@mixin webkit($attr, $val) {
+  -webkit-#{$attr}: $val;
+  -moz-#{$attr}: $val;
+  -ms-#{$attr}: $val;
+  -o-#{$attr}: $val;
+  #{$attr}: $val;
+}

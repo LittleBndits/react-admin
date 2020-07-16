@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react'
 
 // 組件
 import { Form, Input, Button, message } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { UserOutlined, LockOutlined,FileProtectOutlined } from '@ant-design/icons';
 import { Row, Col } from 'antd';
 // 自定义组件
 import Code from '../../compoents/code/index'
@@ -31,8 +31,16 @@ class RegisterForm extends Component {
             code: this.state.code
         }
         console.log("RegisterForm -> onFinish -> Register_data", Register_data)
+
         Register(Register_data).then(res => {
-            message.success(res.data.message)
+        console.log("RegisterForm -> onFinish -> res", res)
+            const that = this;
+            const resdata = res.data;
+            if (resdata.resCode === 0) {
+                message.success(resdata.message, 1.5, () => {
+                    that.toggleForm()
+                })
+            }
         }).catch(res => {
             message.error(res.data.message)
         })
@@ -56,6 +64,9 @@ class RegisterForm extends Component {
             code: val,//验证码
         })
     };
+    /**
+     * 切换登录
+     */
     toggleForm = () => {
         this.props.switchForm('login')
     }
@@ -140,7 +151,7 @@ class RegisterForm extends Component {
                     >
                         <Row gutter={13}>
                             <Col span={15}>
-                                <Input onChange={this.inputChangeCode} prefix={<LockOutlined className="site-form-item-icon" />} placeholder="请输入验证码" />
+                                <Input onChange={this.inputChangeCode} prefix={<FileProtectOutlined className="site-form-item-icon" />} placeholder="请输入验证码" />
                             </Col>
                             <Col span={9}>
                                 <Code username={username} module={module} />

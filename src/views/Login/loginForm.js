@@ -1,13 +1,15 @@
 import React, { Component, Fragment } from 'react'
+import { withRouter } from 'react-router-dom'
 // 組件
-import { Form, Input, Button, Row, Col } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Row, Col, message } from 'antd';
+import { UserOutlined, LockOutlined, FileProtectOutlined } from '@ant-design/icons';
 // 表单校验
 import { validate_password, validate_Email } from '../../utils/validate'
 // api
 import { Login } from '../../api/account'
 // 自定义组件
 import Code from '../../compoents/code/index'
+import {setToken} from '../../utils/session'
 // 加密
 import CryptoJs from 'crypto-js'
 
@@ -16,32 +18,58 @@ class LoginForm extends Component {
         super(props)
         this.state = {
             username: '',
+            password: '',
+            code: '',
             module: 'login',
+            loading: false,
         }
     }
     //登录
     onFinish = (values) => {
-        const ps = CryptoJs.MD5(values.password).toString()
-        const Login_Data = {
-            username: values.username,
-            password: ps,
-            code: values.code
-        }
-        console.log("LoginForm -> onFinish -> Login_Data", Login_Data)
-        Login(Login_Data).then(res => {
-
-        }).catch(() => {
-
+        this.setState({
+            loading: true
         })
-
-        console.log('Received values of form: ', values);
+        const ps = CryptoJs.MD5(this.state.password).toString()
+        const Login_Data = {
+            username: this.state.username,
+            password: ps,
+            code: this.state.code
+        }
+        // console.log("LoginForm -> onFinish -> Login_Data", Login_Data)
+        Login(Login_Data).then(res => {
+            const resdata = res.data;
+            if (resdata.resCode === 0) {
+                this.setState({
+                    loading: false
+                })
+                message.success(resdata.message)
+                setToken(resdata.data.token)
+                // 路由跳转
+                this.props.history.push('/Index')
+            }
+        }).catch(() => {
+            this.setState({
+                loading: false
+            })
+        })
     };
     /* input 输入处理 */
     inputChange = (e) => {
         let val = e.target.value
-        console.log(val);
         this.setState({
             username: val,//账号
+        })
+    };
+    inputChangePassWord = (e) => {
+        let val = e.target.value
+        this.setState({
+            password: val,//密码
+        })
+    };
+    inputChangeCode = (e) => {
+        let val = e.target.value
+        this.setState({
+            code: val,//验证码
         })
     };
 
@@ -49,11 +77,16 @@ class LoginForm extends Component {
     toggleForm = () => {
         this.props.switchForm('register')
     }
-
+    // 显示隐藏loading
+    showLoading = () => {
+        const isload = this.state.loading
+        this.setState({
+            loading: !isload
+        })
+    }
     render() {
-
         // eslint-disable-next-line 
-        const { username, module } = this.state;
+        const { username, module, loading } = this.state;
         const that = this;
         return (
             <Fragment >
@@ -103,7 +136,7 @@ class LoginForm extends Component {
                             }),
                         ]}
                     >
-                        <Input.Password prefix={<LockOutlined className="site-form-item-icon" />} placeholder="密码" />
+                        <Input.Password onChange={this.inputChangePassWord} prefix={<LockOutlined className="site-form-item-icon" />} placeholder="密码" />
                     </Form.Item>
                     <Form.Item name="code"
                         rules={[
@@ -112,7 +145,7 @@ class LoginForm extends Component {
                         ]}>
                         <Row gutter={13}>
                             <Col span={15}>
-                                <Input prefix={<LockOutlined className="site-form-item-icon" />} placeholder="验证码" />
+                                <Input onChange={this.inputChangeCode} prefix={<FileProtectOutlined className="site-form-item-icon" />} placeholder="验证码" />
                             </Col>
                             <Col span={9}>
                                 <Code username={username} module={module} />
@@ -120,7 +153,7 @@ class LoginForm extends Component {
                         </Row>
                     </Form.Item>
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" className="login-form-button" block>登录</Button>
+                        <Button type="primary" loading={loading} htmlType="submit" className="login-form-button" block>登录</Button>
                     </Form.Item>
                 </Form>
             </Fragment>
@@ -128,4 +161,4 @@ class LoginForm extends Component {
     }
 
 }
-export default LoginForm;
+export default withRouter(LoginForm);
