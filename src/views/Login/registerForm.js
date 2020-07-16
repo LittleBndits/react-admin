@@ -10,6 +10,8 @@ import Code from '../../compoents/code/index'
 import { validate_password, validate_Email } from '../../utils/validate'
 // api
 import { Register } from '../../api/account'
+// 加密
+import CryptoJs from 'crypto-js'
 class RegisterForm extends Component {
     constructor(props) {
         super(props)
@@ -22,9 +24,10 @@ class RegisterForm extends Component {
     }
     //注册
     onFinish = (values) => {
+        const md5_passWord = CryptoJs.MD5(this.state.password).toString();
         const Register_data = {
             username: this.state.username,
-            password: this.state.password,
+            password: md5_passWord,
             code: this.state.code
         }
         console.log("RegisterForm -> onFinish -> Register_data", Register_data)

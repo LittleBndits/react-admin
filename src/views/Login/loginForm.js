@@ -8,6 +8,8 @@ import { validate_password, validate_Email } from '../../utils/validate'
 import { Login } from '../../api/account'
 // 自定义组件
 import Code from '../../compoents/code/index'
+// 加密
+import CryptoJs from 'crypto-js'
 
 class LoginForm extends Component {
     constructor(props) {
@@ -19,10 +21,16 @@ class LoginForm extends Component {
     }
     //登录
     onFinish = (values) => {
-        Login(values).then(res => {
-            console.log("LoginForm -> onFinish -> res", res)
-        }).catch(() => {
+        const ps = CryptoJs.MD5(values.password).toString()
+        const Login_Data = {
+            username: values.username,
+            password: ps,
+            code: values.code
+        }
+        console.log("LoginForm -> onFinish -> Login_Data", Login_Data)
+        Login(Login_Data).then(res => {
 
+        }).catch(() => {
 
         })
 
@@ -45,7 +53,7 @@ class LoginForm extends Component {
     render() {
 
         // eslint-disable-next-line 
-        const { username,module } = this.state;
+        const { username, module } = this.state;
         const that = this;
         return (
             <Fragment >
@@ -107,7 +115,7 @@ class LoginForm extends Component {
                                 <Input prefix={<LockOutlined className="site-form-item-icon" />} placeholder="验证码" />
                             </Col>
                             <Col span={9}>
-                                <Code username={username} module={module}/>
+                                <Code username={username} module={module} />
                             </Col>
                         </Row>
                     </Form.Item>
